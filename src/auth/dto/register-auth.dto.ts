@@ -15,7 +15,7 @@ export class RegisterRequest {
     format: 'text',
     minimum: 6,
     maximum: 100,
-    example: 'exapamplepassword',
+    example: 'example',
   })
   password: string;
 
@@ -24,7 +24,7 @@ export class RegisterRequest {
     format: 'text',
     minimum: 6,
     maximum: 100,
-    example: 'examplename',
+    example: 'example',
   })
   username: string;
 }
@@ -32,5 +32,5 @@ export class RegisterRequest {
 export class RegisterResponse {
   email: string;
   username: string;
-  emailVerificationToken: string;
+  emailVerificationToken?: string;
 }
