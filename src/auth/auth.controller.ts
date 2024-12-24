@@ -18,7 +18,7 @@ import {
 import { AuthService } from './auth.service';
 import { WebResponse } from '../model/web.model';
 import { Response } from 'express';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AccessTokenGuard, RefreshTokenGuard } from '../common/guards';
 import { UserData } from '../common/decorators';
 import { User } from './entities/user.entity';
@@ -43,6 +43,7 @@ import { FileUpload } from '../common/decorators/file-upload.decorator';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({ summary: 'Register a user' })
   @HttpCode(201)
   @Post('/register')
   async register(
@@ -57,6 +58,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Verify a user email user' })
   @HttpCode(200)
   @Post('/verify-email')
   async verifyEmail(
@@ -71,6 +73,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Login user' })
   @HttpCode(200)
   @Post('/login')
   async login(
@@ -85,6 +88,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Get authenticated user' })
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
@@ -100,6 +104,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Logout user' })
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
@@ -116,6 +121,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Refresh Access Token' })
   @ApiBearerAuth()
   @UseGuards(RefreshTokenGuard)
   @HttpCode(200)
@@ -133,6 +139,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Forgot Password Via Email' })
   @HttpCode(200)
   @Post('/forgot-password')
   async forgotPassword(
@@ -147,6 +154,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Reset Password Via Email' })
   @HttpCode(200)
   @Post('/reset-password')
   async resetPassword(
@@ -161,6 +169,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Upload Image to Cloud Storage' })
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
@@ -179,6 +188,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Upload Image to Local Server' })
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
@@ -203,6 +213,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Upload Multiple Image to Local Server' })
   @Post('/upload-multiple-local')
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
@@ -212,11 +223,19 @@ export class AuthController {
     @UserData() user: User,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    const response = files.map((file) => ({
-      originalname: file.originalname,
-      filename: file.filename,
+    const result = files.map((file) => ({
+      imageName: file.filename,
+      size: file.size,
+      mimetype: file.mimetype,
+      imageUrl: `${process.env.IP_BACKEND_ORIGIN}/api/v1/auth/${file.filename}`,
+      createdAt: new Date(),
     }));
-    return response;
+
+    return {
+      code: HttpStatus.OK,
+      status: 'Images successfully uploaded',
+      data: result,
+    };
   }
 
   @Get(':imgpath')

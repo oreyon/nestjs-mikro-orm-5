@@ -35,13 +35,12 @@ async function bootstrap() {
   app.enableShutdownHooks();
   const config = new DocumentBuilder()
     .setTitle('Contacts Apps API')
-    .setDescription('Contacts APP API Documentation')
+    .setDescription('Contacts Apps API Documentation')
     .setVersion('1.0')
-    .addTag('contact')
     .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v1/docs', app, documentFactory);
+  SwaggerModule.setup('api/docs', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000);
 }
