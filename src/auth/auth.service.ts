@@ -1,5 +1,4 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { RegisterRequest, RegisterResponse } from './dto/register-auth.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ValidationService } from '../common/validation.service';
@@ -15,23 +14,22 @@ import * as crypto from 'crypto';
 import { TokensResponse } from '../model/tokens.model';
 import { Role, User } from './entities/user.entity';
 import { AuthValidation } from './auth.validation';
-import {
-  EmailVerificationRequest,
-  EmailVerificationResponse,
-} from './dto/verify-email.dto';
-import { LoginRequest, LoginResponse } from './dto/login.dto';
 import { Response } from 'express';
-import { CurrentUserResponse } from './dto/current-user.dto';
-import { RefreshTokenResponse } from './dto/refresh-token.dto';
 import { JwtPayload } from '../common/strategies';
 import {
+  CurrentUserResponse,
+  EmailVerificationRequest,
+  EmailVerificationResponse,
   ForgotPasswordRequest,
   ForgotPasswordResponse,
-} from './dto/forgot-password.dto';
-import {
+  LoginRequest,
+  LoginResponse,
+  RefreshTokenResponse,
+  RegisterRequest,
+  RegisterResponse,
   ResetPasswordRequest,
   ResetPasswordResponse,
-} from './dto/reset-password.dto';
+} from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {

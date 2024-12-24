@@ -12,28 +12,26 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterRequest, RegisterResponse } from './dto/register-auth.dto';
 import { WebResponse } from '../model/web.model';
 import { Response } from 'express';
-import {
-  EmailVerificationRequest,
-  EmailVerificationResponse,
-} from './dto/verify-email.dto';
-import { LoginRequest, LoginResponse } from './dto/login.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AccessTokenGuard, RefreshTokenGuard } from '../common/guards';
 import { UserData } from '../common/decorators';
 import { User } from './entities/user.entity';
-import { CurrentUserResponse } from './dto/current-user.dto';
-import { RefreshTokenResponse } from './dto/refresh-token.dto';
 import {
+  CurrentUserResponse,
+  EmailVerificationRequest,
+  EmailVerificationResponse,
   ForgotPasswordRequest,
   ForgotPasswordResponse,
-} from './dto/forgot-password.dto';
-import {
+  LoginRequest,
+  LoginResponse,
+  RefreshTokenResponse,
+  RegisterRequest,
+  RegisterResponse,
   ResetPasswordRequest,
   ResetPasswordResponse,
-} from './dto/reset-password.dto';
+} from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
