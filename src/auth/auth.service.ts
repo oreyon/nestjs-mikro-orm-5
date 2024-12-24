@@ -429,6 +429,34 @@ export class AuthService {
     userLogin.image = result.secure_url;
     await this.em.flush();
 
+    // return {
+    //   imageId: result.public_id,
+    //   size: result.bytes / 1000,
+    //   format: result.format,
+    //   imageUrl: result.url,
+    //   imageSecureUrl: result.secure_url,
+    //   createdAt: result.created_at,
+    // };
+    return result;
+  }
+
+  private extractPublicId(url: string): string {
+    const parts = url.split('/');
+    const fileName = parts.pop() || ''; // Get the last part of the URL
+    return fileName.split('.')[0]; // Remove the file extension
+  }
+
+  /*async uploadImageLocal(user: User, file: Express.Multer.File) {
+    this.logger.debug(`UPLOAD AVATAR: ${JSON.stringify(file)}`);
+    this.logger.debug(`File size: ${file?.size}`);
+    this.logger.debug(`File mimetype: ${file?.mimetype}`);
+
+    this.validationService.validate(AuthValidation.UPLOAD_IMAGE, {
+      image: file,
+    });
+
+    const userLogin = await this.userRepository.findOne(user.id);
+
     return {
       imageId: result.public_id,
       size: result.bytes / 1000,
@@ -437,11 +465,5 @@ export class AuthService {
       imageSecureUrl: result.secure_url,
       createdAt: result.created_at,
     };
-  }
-
-  private extractPublicId(url: string): string {
-    const parts = url.split('/');
-    const fileName = parts.pop() || ''; // Get the last part of the URL
-    return fileName.split('.')[0]; // Remove the file extension
-  }
+  }*/
 }

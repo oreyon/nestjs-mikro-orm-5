@@ -9,6 +9,8 @@ import { ContactModule } from './contact/contact.module';
 import { AddressModule } from './address/address.module';
 import { NodemailerModule } from './nodemailer/nodemailer.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -22,6 +24,10 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
         limit: 60, // limit each IP to 60 requests per ttl
       },
     ]),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
     MikroModule,
     CommonModule,
     AuthModule,

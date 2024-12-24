@@ -12,6 +12,8 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
+  Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { WebResponse } from '../model/web.model';
@@ -35,6 +37,7 @@ import {
   ResetPasswordResponse,
 } from './dto/auth.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUpload } from '../common/decorators/file-upload.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -174,6 +177,51 @@ export class AuthController {
       status: 'Image successfully uploaded',
       data: result,
     };
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(200)
+  @Post('/upload-local')
+  @FileUpload()
+  async uploadImageLocal(
+    @UserData() user: User,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const result = {
+      imageName: file.filename,
+      size: file.size,
+      mimetype: file.mimetype,
+      imageUrl: `${process.env.IP_BACKEND_ORIGIN}/api/v1/auth/${file.filename}`,
+      createdAt: new Date(),
+    };
+
+    return {
+      code: HttpStatus.OK,
+      status: 'Image successfully uploaded',
+      data: result,
+    };
+  }
+
+  @Post('/upload-multiple-local')
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(200)
+  @FileUpload(true) // Multiple files upload using the custom decorator
+  async uploadMultipleImagesLocal(
+    @UserData() user: User,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    const response = files.map((file) => ({
+      originalname: file.originalname,
+      filename: file.filename,
+    }));
+    return response;
+  }
+
+  @Get(':imgpath')
+  seeUploadedFile(@Param('imgpath') image, @Res() res) {
+    return res.sendFile(image, { root: './uploads' });
   }
 
   @Get('/check-ip')

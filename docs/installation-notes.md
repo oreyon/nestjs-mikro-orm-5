@@ -48,6 +48,7 @@ npm i --save nodemailer
 npm i --save-dev @types/nodemailer
 
 npm i -D @types/multer
+npm install @nestjs/serve-static
 
 npm i --save buffer-to-stream
 npm i --save-dev @types/buffer-to-stream
