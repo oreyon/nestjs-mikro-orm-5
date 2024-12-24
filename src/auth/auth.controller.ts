@@ -10,6 +10,8 @@ import {
   Headers,
   Res,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { WebResponse } from '../model/web.model';
@@ -32,6 +34,7 @@ import {
   ResetPasswordRequest,
   ResetPasswordResponse,
 } from './dto/auth.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 export class AuthController {
@@ -151,6 +154,24 @@ export class AuthController {
     return {
       code: HttpStatus.OK,
       status: 'Password successfully reset',
+      data: result,
+    };
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(200)
+  @Post('/upload')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(
+    @UserData() user: User,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const result = await this.authService.uploadImage(user, file);
+
+    return {
+      code: HttpStatus.OK,
+      status: 'Image successfully uploaded',
       data: result,
     };
   }

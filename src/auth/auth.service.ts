@@ -30,6 +30,7 @@ import {
   ResetPasswordRequest,
   ResetPasswordResponse,
 } from './dto/auth.dto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class AuthService {
@@ -41,6 +42,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private nodemailerService: NodemailerService,
+    private cloudinaryService: CloudinaryService,
   ) {}
   async createTokens(userId: number): Promise<TokensResponse> {
     const [accessToken, refreshToken] = await Promise.all([
@@ -405,5 +407,41 @@ export class AuthService {
       email: user.email,
       username: user.username,
     };
+  }
+
+  async uploadImage(user: User, file: Express.Multer.File) {
+    this.logger.debug(`UPLOAD AVATAR: ${JSON.stringify(file)}`);
+    this.logger.debug(`File size: ${file?.size}`);
+    this.logger.debug(`File mimetype: ${file?.mimetype}`);
+
+    this.validationService.validate(AuthValidation.UPLOAD_IMAGE, {
+      image: file,
+    });
+
+    const userLogin = await this.userRepository.findOne(user.id);
+
+    if (userLogin.image) {
+      const publicId = this.extractPublicId(userLogin.image);
+      await this.cloudinaryService.deleteImage(publicId);
+    }
+
+    const result = await this.cloudinaryService.uploadImage(file);
+    userLogin.image = result.secure_url;
+    await this.em.flush();
+
+    return {
+      imageId: result.public_id,
+      size: result.bytes / 1000,
+      format: result.format,
+      imageUrl: result.url,
+      imageSecureUrl: result.secure_url,
+      createdAt: result.created_at,
+    };
+  }
+
+  private extractPublicId(url: string): string {
+    const parts = url.split('/');
+    const fileName = parts.pop() || ''; // Get the last part of the URL
+    return fileName.split('.')[0]; // Remove the file extension
   }
 }
