@@ -54,6 +54,8 @@ npm i --save buffer-to-stream
 npm i --save-dev @types/buffer-to-stream
 
 npm i cloudinary
+
+npm i --save class-validator class-transformer
 <!-- core-package -->
 
 <!-- mikro-orm-core -->

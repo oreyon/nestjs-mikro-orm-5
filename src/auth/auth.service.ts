@@ -429,15 +429,14 @@ export class AuthService {
     userLogin.image = result.secure_url;
     await this.em.flush();
 
-    // return {
-    //   imageId: result.public_id,
-    //   size: result.bytes / 1000,
-    //   format: result.format,
-    //   imageUrl: result.url,
-    //   imageSecureUrl: result.secure_url,
-    //   createdAt: result.created_at,
-    // };
-    return result;
+    return {
+      imageId: result.public_id,
+      size: result.bytes / 1000,
+      format: result.format,
+      imageUrl: result.url,
+      imageSecureUrl: result.secure_url,
+      createdAt: result.created_at,
+    };
   }
 
   private extractPublicId(url: string): string {
