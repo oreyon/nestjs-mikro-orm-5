@@ -4,7 +4,6 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ValidationService } from '../common/validation.service';
 import { ContactRepository } from './contact.repository';
-import { EntityManager, QueryOrder } from '@mikro-orm/mysql';
 import { ConfigService } from '@nestjs/config';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import {
@@ -20,6 +19,8 @@ import { ContactValidation } from './contact.validation';
 import { Contact } from './entities/contact.entity';
 import { User } from '../auth/entities/user.entity';
 import { Paging } from '../model/web.model';
+import { EntityMetadata, QueryOrder } from '@mikro-orm/core';
+import { EntityManager, MikroORM } from '@mikro-orm/mysql';
 
 @Injectable()
 export class ContactService {
@@ -29,6 +30,7 @@ export class ContactService {
     private readonly configService: ConfigService,
     private contactRepository: ContactRepository,
     private em: EntityManager,
+    private orm: MikroORM,
     private cloudinaryService: CloudinaryService,
   ) {}
 
@@ -57,6 +59,34 @@ export class ContactService {
       email: contact.email,
       phone: contact.phone,
     };
+  }
+
+  async createMany(
+    user: User,
+    requests: CreateContactRequest[],
+  ): Promise<CreateContactResponse[]> {
+    this.logger.debug(`CREATE MANY CONTACTS: ${JSON.stringify(requests)}`);
+
+    const createRequests: CreateContactRequest[] = requests.map((request) =>
+      this.validationService.validate(ContactValidation.CREATE, request),
+    );
+
+    const contacts: Contact[] = createRequests.map((request) =>
+      this.contactRepository.create({
+        ...request,
+        user,
+      }),
+    );
+
+    await this.em.persistAndFlush(contacts);
+
+    return contacts.map((contact) => ({
+      id: contact.id,
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      email: contact.email,
+      phone: contact.phone,
+    }));
   }
 
   async findAll(
@@ -91,7 +121,86 @@ export class ContactService {
       filters.push({ phone: { $like: `%${searchReq.phone}%` } });
     }
 
-    // Fetch contacts with pagination and sorting
+    console.log('sortBy:', searchReq.sortBy);
+    console.log('orderBy:', searchReq.orderBy);
+    /*
+    const metadata: EntityMetadata = this.orm.getMetadata().get(Contact.name);
+
+    // Defaults
+    const defaultField = 'id'; // Default field for sorting
+    const defaultDirection = QueryOrder.ASC; // Default sorting direction
+
+    // const validFields = [
+    //   'id',
+    //   'firstName',
+    //   'lastName',
+    //   'email',
+    //   'phone',
+    //   'createdAt',
+    //   'updatedAt',
+    // ];
+    const validFields = Object.keys(metadata.properties);
+
+    // Determine the sorting field
+    // const field = searchReq.sortBy || defaultField;
+    const field = validFields.includes(searchReq.sortBy || '')
+      ? searchReq.sortBy
+      : defaultField;
+
+    // Log a warning for invalid fields
+    if (searchReq.sortBy && !validFields.includes(searchReq.sortBy)) {
+      console.warn(
+        `Invalid sortBy field "${searchReq.sortBy}", falling back to default "${defaultField}"`,
+      );
+    }
+
+    // Determine the sorting direction
+    const direction =
+      searchReq.orderBy?.toLowerCase() === 'desc'
+        ? QueryOrder.DESC
+        : QueryOrder.ASC;
+
+    // Construct the orderBy object
+    const orderBy = {
+      [field]: direction,
+    };
+
+    */
+
+    // ========================================
+
+    // list fields in the entity
+    const metadata: EntityMetadata = this.orm.getMetadata().get(Contact.name);
+    const validFields = Object.keys(metadata.properties);
+
+    // Defaults sortBy and orderBy
+    const defaultField = 'id';
+    const defaultDirection = QueryOrder.ASC;
+
+    // Split sortBy and orderBy by comma
+    const sortFields = (searchReq.sortBy || defaultField).split(',');
+    const sortDirections = (searchReq.orderBy || 'asc').split(',');
+
+    // Construct the orderBy object
+    const orderBy: Record<string, QueryOrder> = {};
+
+    // Iterate through sortFields and match with sortDirections
+    sortFields.forEach((field, index) => {
+      const direction =
+        sortDirections[index]?.toLowerCase() === 'desc'
+          ? QueryOrder.DESC
+          : QueryOrder.ASC;
+
+      if (validFields.includes(field)) {
+        orderBy[field] = direction;
+      } else {
+        console.warn(`Invalid sortBy field "${field}", skipping.`);
+      }
+    });
+
+    // Log the constructed orderBy object
+    console.log('Constructed orderBy:', orderBy);
+    // ========================================
     const [contacts, totalContacts] = await this.contactRepository.findAndCount(
       {
         user: user.id,
@@ -100,7 +209,7 @@ export class ContactService {
       {
         limit: searchReq.size,
         offset: (searchReq.page - 1) * searchReq.size,
-        // orderBy: { id: QueryOrder.DESC },
+        orderBy: orderBy,
       },
     );
 

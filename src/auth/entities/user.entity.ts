@@ -71,6 +71,12 @@ export class User {
   })
   updatedAt: Date;
 
+  @Property({
+    columnType: 'datetime',
+    nullable: true,
+  })
+  deletedAt?: Date;
+
   @OneToMany(() => Contact, (contact) => contact.user)
   contacts = new Collection<Contact>(this);
 }

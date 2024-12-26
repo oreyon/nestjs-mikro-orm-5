@@ -40,9 +40,15 @@ export class Contact {
   @OneToMany(() => Address, (address) => address.contact)
   address = new Collection<Address>(this);
 
-  @Property({ type: 'date', onUpdate: () => new Date() })
+  @Property({ type: 'datetime', onUpdate: () => new Date() })
   updatedAt = new Date();
 
-  @Property({ type: 'date', onCreate: () => new Date() })
+  @Property({ type: 'datetime', onCreate: () => new Date() })
   createdAt = new Date();
+
+  @Property({
+    columnType: 'datetime',
+    nullable: true,
+  })
+  deletedAt?: Date;
 }

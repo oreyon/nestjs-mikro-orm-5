@@ -32,4 +32,23 @@ export class Address {
 
   @ManyToOne(() => Contact)
   contact!: Contact;
+
+  @Property({
+    onCreate: () => new Date(),
+    columnType: 'datetime',
+  })
+  createdAt: Date;
+
+  @Property({
+    onCreate: () => new Date(),
+    onUpdate: () => new Date(),
+    columnType: 'datetime',
+  })
+  updatedAt: Date;
+
+  @Property({
+    columnType: 'datetime',
+    nullable: true,
+  })
+  deletedAt?: Date;
 }

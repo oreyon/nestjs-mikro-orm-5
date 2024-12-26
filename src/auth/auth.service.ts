@@ -54,7 +54,7 @@ export class AuthService {
         },
         {
           secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
-          expiresIn: 60 * 2,
+          expiresIn: 60 * 2, // 2 minutes
         },
       ),
       this.jwtService.signAsync(
@@ -65,7 +65,7 @@ export class AuthService {
         },
         {
           secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
-          expiresIn: 60 * 60 * 24,
+          expiresIn: 60 * 60 * 24, // 24 hours
         },
       ),
     ]);

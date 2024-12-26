@@ -22,5 +22,7 @@ export class ContactValidation {
     phone: z.string().min(6).max(20).optional(),
     page: z.number().positive().min(1),
     size: z.number().positive().min(1),
+    sortBy: z.string().optional(),
+    orderBy: z.string().optional(),
   });
 }

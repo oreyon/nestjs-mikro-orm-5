@@ -1,6 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, Matches, Min } from 'class-validator';
-import { Type } from 'class-transformer';
 
 export class CreateContactRequest {
   @ApiProperty({
@@ -99,8 +97,6 @@ export class SearchContactReq {
     format: 'text',
     example: 'johndoe',
   })
-  @IsOptional()
-  @IsString()
   username?: string;
 
   @ApiPropertyOptional({
@@ -108,8 +104,6 @@ export class SearchContactReq {
     format: 'email',
     example: 'example@example.com',
   })
-  @IsOptional()
-  @IsString()
   email?: string;
 
   @ApiPropertyOptional({
@@ -117,8 +111,6 @@ export class SearchContactReq {
     format: 'text',
     example: '08123456789',
   })
-  @IsOptional()
-  @IsString()
   phone?: string;
 
   @ApiPropertyOptional({
@@ -126,10 +118,6 @@ export class SearchContactReq {
     format: 'number',
     example: 1,
   })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
   page?: number = 1;
 
   @ApiPropertyOptional({
@@ -137,11 +125,21 @@ export class SearchContactReq {
     format: 'number',
     example: 10,
   })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
   size?: number = 10;
+
+  @ApiPropertyOptional({
+    description: 'Sorting field and direction',
+    format: 'string',
+    example: 'id/email',
+  })
+  sortBy?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter contacts by created date',
+    format: 'string',
+    example: 'asc/desc/asc,desc',
+  })
+  orderBy?: string;
 }
 
 export class SearchContactRes {
