@@ -48,7 +48,7 @@ export class ContactController {
 
     return {
       code: HttpStatus.CREATED,
-      status: 'Created',
+      status: 'Success create a contact',
       data: result,
     };
   }
@@ -65,7 +65,7 @@ export class ContactController {
 
     return {
       code: HttpStatus.CREATED,
-      status: 'Created',
+      status: 'Success create many contacts',
       data: result,
     };
   }
