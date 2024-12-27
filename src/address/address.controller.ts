@@ -118,7 +118,6 @@ export class AddressController {
       contactId: contactId,
       addressId: addressId,
     };
-
     const result = await this.addressService.remove(user, request);
     return {
       code: HttpStatus.OK,
