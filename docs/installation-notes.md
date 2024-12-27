@@ -15,6 +15,18 @@
 }
 ```
 
+- Config jest testing in root package.json 
+```
+"scripts": {
+  "test": "set NODE_ENV=development&&jest --runInBand --no-cache",
+}
+```
+```
+"jest": {
+    "rootDir": "test",
+}
+```
+
 <!-- core-package -->
 nest new nest-mikro-orm-repository
 
