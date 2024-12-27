@@ -102,7 +102,7 @@
     "testEnvironment": "node"
   },
   "mikro-orm": {
-    "useTsNode": true,
+    "useTsNode": false,
     "tsConfigPath": "./tsconfig.json",
     "configPaths": [
       "./src/mikro-orm.config.ts",
