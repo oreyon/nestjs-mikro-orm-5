@@ -58,6 +58,7 @@ export class ContactService {
       lastName: contact.lastName,
       email: contact.email,
       phone: contact.phone,
+      image: contact.image,
     };
   }
 
@@ -86,6 +87,7 @@ export class ContactService {
       lastName: contact.lastName,
       email: contact.email,
       phone: contact.phone,
+      image: contact.image,
     }));
   }
 
@@ -175,7 +177,7 @@ export class ContactService {
 
     // Defaults sortBy and orderBy
     const defaultField = 'id';
-    const defaultDirection = QueryOrder.ASC;
+    // const defaultDirection = QueryOrder.ASC;
 
     // Split sortBy and orderBy by comma
     const sortFields = (searchReq.sortBy || defaultField).split(',');
@@ -220,6 +222,7 @@ export class ContactService {
       lastName: contact.lastName,
       email: contact.email,
       phone: contact.phone,
+      image: contact.image,
     }));
 
     // Calculate total pages
@@ -253,6 +256,7 @@ export class ContactService {
       lastName: contact.lastName,
       email: contact.email,
       phone: contact.phone,
+      image: contact.image,
     };
   }
 
@@ -301,6 +305,7 @@ export class ContactService {
       lastName: contact.lastName,
       email: contact.email,
       phone: contact.phone,
+      image: contact.image,
     };
   }
 
@@ -317,5 +322,30 @@ export class ContactService {
     await this.em.flush();
 
     return true;
+  }
+
+  async uploadImage(user: User, contactId: number, file: Express.Multer.File) {
+    this.logger.debug(`File size: ${file?.size}`);
+    this.logger.debug(`File mimetype: ${file?.mimetype}`);
+
+    this.validationService.validate(ContactValidation.UPLOAD_IMAGE, {
+      image: file,
+    });
+
+    // check contact exist
+    const contact: Contact = await this.checkContactExist(user.id, contactId);
+
+    const result = await this.cloudinaryService.uploadImage(file);
+    contact.image = result.secure_url;
+    await this.em.flush();
+
+    return {
+      imageId: result.public_id,
+      size: result.bytes / 1000,
+      format: result.format,
+      imageUrl: result.url,
+      imageSecureUrl: result.secure_url,
+      createdAt: result.created_at,
+    };
   }
 }

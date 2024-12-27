@@ -263,6 +263,7 @@ export class AuthService {
       email: user.email,
       username: user.username,
       role: user.role,
+      image: user.image,
     };
   }
 
@@ -410,7 +411,6 @@ export class AuthService {
   }
 
   async uploadImage(user: User, file: Express.Multer.File) {
-    this.logger.debug(`UPLOAD AVATAR: ${JSON.stringify(file)}`);
     this.logger.debug(`File size: ${file?.size}`);
     this.logger.debug(`File mimetype: ${file?.mimetype}`);
 

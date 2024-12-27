@@ -14,6 +14,7 @@ import {
   UploadedFile,
   UploadedFiles,
   Param,
+  Put,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { WebResponse } from '../model/web.model';
@@ -173,7 +174,7 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
-  @Post('/upload')
+  @Put('/upload')
   @UseInterceptors(FileInterceptor('image'))
   async uploadImage(
     @UserData() user: User,
@@ -192,7 +193,7 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
-  @Post('/upload-local')
+  @Put('/upload-local')
   @FileUpload()
   async uploadImageLocal(
     @UserData() user: User,
@@ -214,7 +215,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Upload Multiple Image to Local Server' })
-  @Post('/upload-multiple-local')
+  @Put('/upload-multiple-local')
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)

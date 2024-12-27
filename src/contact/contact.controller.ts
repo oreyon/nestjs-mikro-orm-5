@@ -10,11 +10,14 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AccessTokenGuard } from '../common/guards';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import {
   CreateContactRequest,
   CreateContactResponse,
@@ -26,8 +29,10 @@ import {
 import { UserData } from '../common/decorators';
 import { User } from '../auth/entities/user.entity';
 import { WebResponse } from '../model/web.model';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(AccessTokenGuard)
+@ApiBearerAuth()
 @Controller('contacts')
 export class ContactController {
   constructor(private readonly contactService: ContactService) {}
@@ -98,6 +103,23 @@ export class ContactController {
       status: 'Success get all contacts',
       data: result.data,
       paging: result.paging,
+    };
+  }
+
+  @ApiOperation({ summary: 'Upload image contact to cloud storage' })
+  @HttpCode(200)
+  @Put(':contactId/upload')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(
+    @UserData() user: User,
+    @Param('contactId', ParseIntPipe) contactId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const result = await this.contactService.uploadImage(user, contactId, file);
+    return {
+      code: HttpStatus.OK,
+      status: 'Success upload image',
+      data: result,
     };
   }
 

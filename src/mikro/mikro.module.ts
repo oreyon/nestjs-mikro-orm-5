@@ -10,9 +10,10 @@ import * as winston from 'winston';
     MikroOrmModule.forRoot(mikroOrmConfig),
     WinstonModule.forRoot({
       level: 'debug',
-      format: winston.format.combine(
-        winston.format.prettyPrint({ colorize: true }),
-      ),
+      // format: winston.format.combine(
+      //   winston.format.prettyPrint({ colorize: true }),
+      // ),
+      format: winston.format.cli(),
       transports: [new winston.transports.Console()],
     }),
   ],

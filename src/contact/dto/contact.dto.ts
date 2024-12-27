@@ -36,6 +36,7 @@ export class CreateContactResponse {
   lastName?: string;
   email?: string;
   phone?: string;
+  image?: string;
 }
 
 export class GetContactResponse {
@@ -44,6 +45,7 @@ export class GetContactResponse {
   lastName?: string;
   email?: string;
   phone?: string;
+  image?: string;
 }
 
 export class UpdateContactReq {
@@ -89,6 +91,7 @@ export class UpdateContactRes {
   lastName?: string;
   email?: string;
   phone?: string;
+  image?: string;
 }
 
 export class SearchContactReq {
@@ -148,4 +151,5 @@ export class SearchContactRes {
   lastName?: string;
   email?: string;
   phone?: string;
+  image?: string;
 }

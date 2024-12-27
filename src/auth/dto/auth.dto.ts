@@ -94,6 +94,7 @@ export class CurrentUserResponse {
   email: string;
   username: string;
   role: Role;
+  image?: string;
 }
 
 export class RefreshTokenRequest {
