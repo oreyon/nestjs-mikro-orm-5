@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { AddressController } from './address.controller';
-import { ContactModule } from '../contact/contact.module';
+// import { ContactModule } from '../contact/contact.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Address } from './entities/address.entity';
+import { Contact } from '../contact/entities/contact.entity';
 
 @Module({
-  imports: [ContactModule, MikroOrmModule.forFeature([Address])],
+  imports: [MikroOrmModule.forFeature([Address, Contact])],
   controllers: [AddressController],
   providers: [AddressService],
 })

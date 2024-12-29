@@ -441,4 +441,52 @@ describe('AuthController', () => {
       expect(response.body.data.username).toBeDefined();
     });
   });
+
+  describe('PUT /api/v1/auth/upload', () => {
+    beforeEach(async () => {
+      await testService.deleteUser();
+      await testService.createUser();
+      await testService.verifyEmail();
+    });
+
+    afterEach(async () => {
+      await testService.deleteUser();
+    });
+
+    it('should be reject upload image if name is wrong', async () => {
+      const tokens = await testService.login(app);
+      console.log(tokens.signedAccessToken);
+      console.log(tokens.signedRefreshToken);
+
+      // Pass signed token to cookie
+      const response = await request(app.getHttpServer())
+        .put('/api/v1/auth/upload')
+        // .set('Authorization', `Bearer ${tokens.accessToken}`);
+        .set('Cookie', [`${tokens.signedAccessToken}`])
+        .attach('file', 'test/assets/asset-img-test-2.jpg');
+
+      logger.info(response.body);
+      expect(response.status).toBe(400);
+      expect(response.body.errors).toBeDefined();
+    });
+
+    it('should be able to upload image to cloud storage', async () => {
+      const tokens = await testService.login(app);
+      console.log(tokens.signedAccessToken);
+      console.log(tokens.signedRefreshToken);
+
+      // Pass signed token to cookie
+      const response = await request(app.getHttpServer())
+        .put('/api/v1/auth/upload')
+        // .set('Authorization', `Bearer ${tokens.accessToken}`);
+        .set('Cookie', [`${tokens.signedAccessToken}`])
+        .attach('image', 'test/assets/asset-img-test-2.jpg');
+
+      logger.info(response.body);
+      expect(response.status).toBe(200);
+      expect(response.body.data.imageId).toBeDefined();
+      expect(response.body.data.size).toBeDefined();
+      expect(response.body.data.imageSecureUrl).toBeDefined();
+    });
+  });
 });

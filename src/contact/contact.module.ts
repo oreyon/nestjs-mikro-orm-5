@@ -9,6 +9,6 @@ import { CloudinaryModule } from '../cloudinary/cloudinary.module';
   imports: [MikroOrmModule.forFeature([Contact]), CloudinaryModule],
   controllers: [ContactController],
   providers: [ContactService],
-  exports: [ContactService],
+  exports: [],
 })
 export class ContactModule {}

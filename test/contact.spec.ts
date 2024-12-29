@@ -444,4 +444,50 @@ describe('ContactController', () => {
       expect(response.body.paging.total_page).toBe(16);
     });
   });
+
+  describe('PUT /api/v1/contacts/:contactId/upload', () => {
+    beforeEach(async () => {
+      await testService.deleteManyContact();
+      await testService.deleteUser();
+      await testService.createUser();
+      await testService.verifyEmail();
+      await testService.createContact();
+    });
+
+    afterEach(async () => {
+      await testService.deleteManyContact();
+      await testService.deleteUser();
+    });
+
+    it('should be able to upload image contact', async () => {
+      const tokens = await testService.login(app);
+      const contact = await testService.getContactId();
+
+      console.log(`Contact Id: ${contact.id}`);
+      const response = await request(app.getHttpServer())
+        .put(`/api/v1/contacts/${contact.id}/upload`)
+        .set('Cookie', [`${tokens.signedAccessToken}`])
+        .attach('file', './test/assets/asset-img-test-2.jpg');
+
+      logger.info(response.body);
+      expect(response.status).toBe(400);
+      expect(response.body.errors).toBeDefined();
+    });
+
+    it('should be able to upload image contact', async () => {
+      const tokens = await testService.login(app);
+      const contact = await testService.getContactId();
+
+      console.log(`Contact Id: ${contact.id}`);
+      const response = await request(app.getHttpServer())
+        .put(`/api/v1/contacts/${contact.id}/upload`)
+        .set('Cookie', [`${tokens.signedAccessToken}`])
+        .attach('image', './test/assets/asset-img-test-2.jpg');
+
+      logger.info(response.body);
+      expect(response.status).toBe(200);
+      expect(response.body.data.imageId).toBeDefined();
+      expect(response.body.data.imageSecureUrl).toBeDefined();
+    });
+  });
 });

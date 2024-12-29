@@ -13,7 +13,7 @@ import * as winston from 'winston';
       // format: winston.format.combine(
       //   winston.format.prettyPrint({ colorize: true }),
       // ),
-      format: winston.format.cli(),
+      format: winston.format.json(),
       transports: [new winston.transports.Console()],
     }),
   ],

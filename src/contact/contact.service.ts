@@ -1,10 +1,8 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ValidationService } from '../common/validation.service';
 import { ContactRepository } from './contact.repository';
-import { ConfigService } from '@nestjs/config';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import {
   CreateContactRequest,
@@ -27,7 +25,6 @@ export class ContactService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     private readonly validationService: ValidationService,
-    private readonly configService: ConfigService,
     private contactRepository: ContactRepository,
     private em: EntityManager,
     private orm: MikroORM,
@@ -260,19 +257,6 @@ export class ContactService {
     };
   }
 
-  async checkContactExist(userId: number, contactId: number): Promise<Contact> {
-    const contact: Contact = await this.contactRepository.findOne({
-      id: contactId,
-      user: userId,
-    });
-
-    if (!contact) {
-      throw new HttpException('Contact not found', 404);
-    }
-
-    return contact;
-  }
-
   async update(
     user: User,
     request: UpdateContactReq,
@@ -284,7 +268,7 @@ export class ContactService {
       request,
     );
 
-    const contact: Contact = await this.checkContactExist(
+    const contact: Contact = await this.contactRepository.checkContactExist(
       user.id,
       updateRequest.id,
     );
@@ -312,7 +296,10 @@ export class ContactService {
   async remove(user: User, contactId: number): Promise<boolean> {
     this.logger.debug(`DELETE CONTACT: ${JSON.stringify(contactId)}`);
 
-    const contact: Contact = await this.checkContactExist(user.id, contactId);
+    const contact: Contact = await this.contactRepository.checkContactExist(
+      user.id,
+      contactId,
+    );
 
     if (contact.user.id !== user.id) {
       throw new HttpException('Unauthorized', 401);
@@ -333,7 +320,10 @@ export class ContactService {
     });
 
     // check contact exist
-    const contact: Contact = await this.checkContactExist(user.id, contactId);
+    const contact: Contact = await this.contactRepository.checkContactExist(
+      user.id,
+      contactId,
+    );
 
     const result = await this.cloudinaryService.uploadImage(file);
     contact.image = result.secure_url;

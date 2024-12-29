@@ -1,11 +1,11 @@
-import 'dotenv/config';
-import { defineConfig } from '@mikro-orm/mysql';
 import { Logger } from '@nestjs/common';
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
 import { EntityGenerator } from '@mikro-orm/entity-generator';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { SeedManager } from '@mikro-orm/seeder';
+import { defineConfig } from '@mikro-orm/mysql';
+import 'dotenv/config';
 
 export default defineConfig({
   host: process.env.DB_HOST,

@@ -1,10 +1,10 @@
-import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ValidationService } from '../common/validation.service';
+import { ContactRepository } from '../contact/contact.repository';
 import { AddressRepository } from './address.repository';
 import { EntityManager } from '@mikro-orm/mysql';
-import { ContactService } from '../contact/contact.service';
 import { User } from '../auth/entities/user.entity';
 import {
   CreateAddressReq,
@@ -22,7 +22,7 @@ export class AddressService {
   constructor(
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     private readonly validationService: ValidationService,
-    private readonly contactService: ContactService,
+    private readonly contactRepository: ContactRepository,
     private readonly addressRepository: AddressRepository,
     private em: EntityManager,
   ) {}
@@ -38,7 +38,7 @@ export class AddressService {
       request,
     );
 
-    const checkContact = await this.contactService.checkContactExist(
+    const checkContact = await this.contactRepository.checkContactExist(
       user.id,
       createRequest.contactId,
     );
@@ -63,7 +63,7 @@ export class AddressService {
   async findAll(user: User, contactId: number): Promise<GetAddressRes[]> {
     this.logger.debug(`GET ALL ADDRESSES: ${contactId}`);
 
-    const contact = await this.contactService.checkContactExist(
+    const contact = await this.contactRepository.checkContactExist(
       user.id,
       contactId,
     );
@@ -90,12 +90,12 @@ export class AddressService {
       request,
     );
 
-    const contact = await this.contactService.checkContactExist(
+    const contact = await this.contactRepository.checkContactExist(
       user.id,
       getRequest.contactId,
     );
 
-    const address = await this.checkAddressExist(
+    const address = await this.addressRepository.checkAddressExist(
       contact.id,
       getRequest.addressId,
     );
@@ -110,19 +110,6 @@ export class AddressService {
     };
   }
 
-  async checkAddressExist(contactId: number, addressId: number) {
-    const address = await this.addressRepository.findOne({
-      contact: contactId,
-      id: addressId,
-    });
-
-    if (!address) {
-      throw new HttpException('Address not found', 404);
-    }
-
-    return address;
-  }
-
   async update(
     user: User,
     request: UpdateAddressReq,
@@ -134,12 +121,15 @@ export class AddressService {
       request,
     );
 
-    const contact = await this.contactService.checkContactExist(
+    const contact = await this.contactRepository.checkContactExist(
       user.id,
       updateRequest.contactId,
     );
 
-    const address = await this.checkAddressExist(contact.id, updateRequest.id);
+    const address = await this.addressRepository.checkAddressExist(
+      contact.id,
+      updateRequest.id,
+    );
 
     const data: UpdateAddressReq = {
       id: address.id,
@@ -170,12 +160,12 @@ export class AddressService {
       request,
     );
 
-    const contact = await this.contactService.checkContactExist(
+    const contact = await this.contactRepository.checkContactExist(
       user.id,
       removeRequest.contactId,
     );
 
-    const address = await this.checkAddressExist(
+    const address = await this.addressRepository.checkAddressExist(
       contact.id,
       removeRequest.addressId,
     );
